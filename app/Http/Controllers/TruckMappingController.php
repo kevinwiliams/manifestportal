@@ -45,7 +45,7 @@ class TruckMappingController extends Controller
     {
         $mapping = $truck_mapping;
 
-        return view('admin.truck_mappings.form', compact('mapping'));
+        return view('admin.truck_mappings.edit', compact('mapping'));
     }
 
     public function update(Request $request, TruckMapping $truck_mapping)
