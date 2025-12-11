@@ -19,13 +19,9 @@
                         <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-semibold">
                             Pending – waiting for second pub code for this date
                         </span>
-                    @elseif($upload->status === 'ready')
-                        <span class="px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs font-semibold">
-                            Ready – both files present, finalizing…
-                        </span>
-                    @elseif($upload->status === 'processed')
+                    @elseif($upload->status === 'completed')
                         <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-semibold">
-                            Processed – combined manifest created
+                            Completed – combined manifest created
                         </span>
                     @endif
                 </div>

@@ -62,9 +62,9 @@ class FinalizeManifestService
 
         Storage::put($filename, $csvContent);
 
-        // Mark uploads as processed
+        // Mark uploads as completed
         ManifestUpload::whereIn('id', $uploadIds)->update([
-            'status' => 'processed',
+            'status' => 'completed',
             'combined_at' => now(),
             'combined_file_path' => $filename,
         ]);

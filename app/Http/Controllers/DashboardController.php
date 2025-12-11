@@ -36,7 +36,7 @@ class DashboardController extends Controller
             'pub_date',
             DB::raw('COUNT(*) as upload_count'),
             DB::raw("SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending_count"),
-            DB::raw("SUM(CASE WHEN status = 'processed' THEN 1 ELSE 0 END) as processed_count")
+            DB::raw("SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as processed_count")
         )
             ->groupBy('pub_date')
             ->orderByDesc('pub_date')
