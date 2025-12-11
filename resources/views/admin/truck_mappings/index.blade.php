@@ -27,8 +27,8 @@
                 <tbody class="divide-y divide-gray-200">
                 @foreach ($mappings as $map)
                     <tr>
-                        <td class="px-3 py-2">{{ $map->original }}</td>
-                        <td class="px-3 py-2">{{ $map->mapped_to }}</td>
+                        <td class="px-3 py-2">{{ $map->source_code }}</td>
+                        <td class="px-3 py-2">{{ $map->target_code }}</td>
                         <td class="px-3 py-2 text-right">
                             <a href="{{ route('admin.truck-mappings.edit', $map->id) }}"
                                class="text-blue-600 hover:underline">Edit</a>
