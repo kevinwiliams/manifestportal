@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\ManifestUpload;
@@ -25,18 +26,18 @@ class DashboardController extends Controller
     //         ->groupBy('pub_date')
     //         ->orderByDesc('pub_date')
     //         ->get();
-    
+
     //     return view('dashboard', compact('summary'));
     // }
 
     public function index()
     {
         $summary = ManifestUpload::select(
-                'pub_date',
-                DB::raw('COUNT(*) as upload_count'),
-                DB::raw("SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending_count"),
-                DB::raw("SUM(CASE WHEN status = 'processed' THEN 1 ELSE 0 END) as processed_count")
-            )
+            'pub_date',
+            DB::raw('COUNT(*) as upload_count'),
+            DB::raw("SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending_count"),
+            DB::raw("SUM(CASE WHEN status = 'processed' THEN 1 ELSE 0 END) as processed_count")
+        )
             ->groupBy('pub_date')
             ->orderByDesc('pub_date')
             ->limit(30)
@@ -44,5 +45,4 @@ class DashboardController extends Controller
 
         return view('dashboard', compact('summary'));
     }
-    
 }

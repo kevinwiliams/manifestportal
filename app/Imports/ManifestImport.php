@@ -5,17 +5,19 @@ namespace App\Imports;
 use App\Models\ManifestRow;
 use App\Models\ManifestUpload;
 use App\Models\TruckMapping;
+use Carbon\Carbon;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Http\UploadedFile;
-use Carbon\Carbon;
 
 class ManifestImport implements ToCollection, WithHeadingRow
 {
     protected ManifestUpload $upload;
+
     protected int $imported = 0;
+
     protected int $skipped = 0;
 
     /** @var array<string,string> */
@@ -41,38 +43,44 @@ class ManifestImport implements ToCollection, WithHeadingRow
             $this->upload->total_rows++;
 
             // --- normalize fields as before ---
-            $truck  = strtoupper(trim($row['truck'] ?? ''));
+            $truck = strtoupper(trim($row['truck'] ?? ''));
 
-            $name   = trim($row['name'] ?? $row['agent_name'] ?? '');
+            $name = trim($row['name'] ?? $row['agent_name'] ?? '');
             $dropAddress = trim($row['drop_address'] ?? $row['address'] ?? '');
-            $route  = trim($row['route'] ?? $row['route_id'] ?? '');
-            $type   = strtoupper(trim($row['type'] ?? ''));
-            $seq    = $row['seq'] ?? null;
+            $route = trim($row['route'] ?? $row['route_id'] ?? '');
+            $type = strtoupper(trim($row['type'] ?? ''));
+            $seq = $row['seq'] ?? null;
             $account = trim($row['account'] ?? '');
-            $group   = trim($row['group'] ?? '');
-            $draw    = $row['draw'] ?? null;
+            $group = trim($row['group'] ?? '');
+            $draw = $row['draw'] ?? null;
             $returns = $row['returns'] ?? null;
 
             $pubCode = trim($row['pub_code'] ?? $this->upload->pub_code);
             $pubDate = $this->upload->pub_date;
-            if (!empty($row['pub_date'])) {
+            if (! empty($row['pub_date'])) {
                 $pubDate = Carbon::parse($row['pub_date']);
             }
 
-            $truckDescr       = trim($row['truck_descr'] ?? '');
+            $truckDescr = trim($row['truck_descr'] ?? '');
             $dropInstructions = trim($row['drop_instructions'] ?? '');
 
             // --- skip rules ---
             if ($route === '') {
-                $this->skipped++; continue;
+                $this->skipped++;
+
+                continue;
             }
 
             if ($truck === 'SUBC') {
-                $this->skipped++; continue;
+                $this->skipped++;
+
+                continue;
             }
 
             if ($type === 'SUBSCRIPTION CARRIER') {
-                $this->skipped++; continue;
+                $this->skipped++;
+
+                continue;
             }
 
             // --- DB-based truck mapping ---
@@ -86,25 +94,27 @@ class ManifestImport implements ToCollection, WithHeadingRow
                     ->exists();
 
                 if ($exists) {
-                    $this->skipped++; continue;
+                    $this->skipped++;
+
+                    continue;
                 }
             }
 
             ManifestRow::create([
-                'upload_id'         => $this->upload->id,
-                'truck'             => $mappedTruck,
-                'name'              => $name,
-                'drop_address'      => $dropAddress,
-                'route'             => $route,
-                'type'              => $type,
-                'seq'               => $seq,
-                'account'           => $account,
-                'group'             => $group,
-                'draw'              => $draw,
-                'returns'           => $returns,
-                'pub_code'          => $pubCode,
-                'pub_date'          => $pubDate,
-                'truck_descr'       => $truckDescr,
+                'upload_id' => $this->upload->id,
+                'truck' => $mappedTruck,
+                'name' => $name,
+                'drop_address' => $dropAddress,
+                'route' => $route,
+                'type' => $type,
+                'seq' => $seq,
+                'account' => $account,
+                'group' => $group,
+                'draw' => $draw,
+                'returns' => $returns,
+                'pub_code' => $pubCode,
+                'pub_date' => $pubDate,
+                'truck_descr' => $truckDescr,
                 'drop_instructions' => $dropInstructions,
             ]);
 
@@ -112,10 +122,10 @@ class ManifestImport implements ToCollection, WithHeadingRow
         }
 
         $this->upload->update([
-            'total_rows'    => $this->upload->total_rows,
+            'total_rows' => $this->upload->total_rows,
             'imported_rows' => $this->imported,
-            'skipped_rows'  => $this->skipped,
-            'status'        => 'completed',
+            'skipped_rows' => $this->skipped,
+            'status' => 'completed',
         ]);
     }
 
@@ -124,10 +134,10 @@ class ManifestImport implements ToCollection, WithHeadingRow
         $request->validate([
             'pub_code' => 'required',
             'pub_date' => 'required|date',
-            'file'     => 'required|file',
+            'file' => 'required|file',
         ]);
 
-        $upload = new ManifestUpload();
+        $upload = new ManifestUpload;
         $upload->pub_code = $request->pub_code;
         $upload->pub_date = $request->pub_date;
         $upload->status = 'pending';
@@ -149,7 +159,7 @@ class ManifestImport implements ToCollection, WithHeadingRow
         return redirect()->route('uploads.show', $upload->id);
     }
 
-	public static function detectMetadata(UploadedFile $file): array
+    public static function detectMetadata(UploadedFile $file): array
     {
         $sheets = Excel::toArray([], $file);
         if (empty($sheets) || empty($sheets[0])) {
@@ -163,7 +173,7 @@ class ManifestImport implements ToCollection, WithHeadingRow
         $pubDateIndex = null;
 
         foreach ($header as $i => $col) {
-            $colLower = strtolower(trim((string)$col));
+            $colLower = strtolower(trim((string) $col));
             if (str_contains($colLower, 'pub code')) {
                 $pubCodeIndex = $i;
             }
@@ -178,14 +188,14 @@ class ManifestImport implements ToCollection, WithHeadingRow
 
         // look at the first non-empty data row
         $dataRow = $rows[1] ?? null;
-        if (!$dataRow) {
+        if (! $dataRow) {
             return [];
         }
 
         $meta = [];
 
         if ($pubCodeIndex !== null) {
-            $meta['pub_code'] = trim((string)($dataRow[$pubCodeIndex] ?? ''));
+            $meta['pub_code'] = trim((string) ($dataRow[$pubCodeIndex] ?? ''));
         }
 
         if ($pubDateIndex !== null) {
@@ -211,7 +221,9 @@ class ManifestImport implements ToCollection, WithHeadingRow
         $possibleHeaders = ['truck', 'agent name', 'name', 'route', 'pub date', 'drop address'];
 
         foreach ($row as $value) {
-            if (!$value) continue;
+            if (! $value) {
+                continue;
+            }
             $lower = strtolower(trim($value));
             foreach ($possibleHeaders as $header) {
                 if (str_contains($lower, $header)) {
@@ -219,6 +231,7 @@ class ManifestImport implements ToCollection, WithHeadingRow
                 }
             }
         }
+
         return false;
     }
 
@@ -230,7 +243,9 @@ class ManifestImport implements ToCollection, WithHeadingRow
         foreach ($rows as $i => $r) {
 
             // skip empty rows
-            if (count(array_filter($r)) == 0) continue;
+            if (count(array_filter($r)) == 0) {
+                continue;
+            }
 
             // auto detect header row
             if ($i == 0 && $this->isHeaderRow($r)) {
@@ -241,40 +256,46 @@ class ManifestImport implements ToCollection, WithHeadingRow
             $truck = trim($r[0] ?? '');
 
             // Skip SUBC truck
-            if (strtoupper($truck) === 'SUBC') continue;
+            if (strtoupper($truck) === 'SUBC') {
+                continue;
+            }
 
             $type = trim($r[4] ?? '');
 
             // Skip SUBSCRIPTION CARRIER
-            if (strtoupper($type) === 'SUBSCRIPTION CARRIER') continue;
+            if (strtoupper($type) === 'SUBSCRIPTION CARRIER') {
+                continue;
+            }
 
             $route = trim($r[3] ?? '');
-            if ($route === '') continue;
+            if ($route === '') {
+                continue;
+            }
 
             $account = trim($r[6] ?? '');
 
             // Prevent duplicates (pubdate + account)
             if (ManifestRow::where('pub_date', $upload->pub_date)
-                        ->where('account', $account)
-                        ->exists()) {
+                ->where('account', $account)
+                ->exists()) {
                 continue;
             }
 
             ManifestRow::create([
-                'upload_id'    => $upload->id,
-                'truck'        => $truck,
-                'name'         => $r[1] ?? '',
+                'upload_id' => $upload->id,
+                'truck' => $truck,
+                'name' => $r[1] ?? '',
                 'drop_address' => $r[2] ?? '',
-                'route'        => $route,
-                'type'         => $type,
-                'seq'          => $r[5] ?? null,
-                'account'      => $account,
-                'group'        => $r[7] ?? '',
-                'draw'         => $r[8] ?? 0,
-                'returns'      => $r[9] ?? 0,
-                'pub_code'     => $upload->pub_code,
-                'pub_date'     => $upload->pub_date,
-                'truck_descr'  => $r[12] ?? null,
+                'route' => $route,
+                'type' => $type,
+                'seq' => $r[5] ?? null,
+                'account' => $account,
+                'group' => $r[7] ?? '',
+                'draw' => $r[8] ?? 0,
+                'returns' => $r[9] ?? 0,
+                'pub_code' => $upload->pub_code,
+                'pub_date' => $upload->pub_date,
+                'truck_descr' => $r[12] ?? null,
                 'drop_instructions' => $r[13] ?? null,
             ]);
 
@@ -283,6 +304,4 @@ class ManifestImport implements ToCollection, WithHeadingRow
 
         return $count;
     }
-
-
 }

@@ -5,10 +5,9 @@ namespace App\Http\Controllers;
 use App\Exports\DistributionReportExport;
 use App\Exports\TruckSummaryReportExport;
 use App\Models\ManifestRow;
-use Illuminate\Http\Request;
-use Carbon\Carbon;
-use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
@@ -51,7 +50,7 @@ class ReportController extends Controller
         $rows = $query->orderBy('truck')->orderBy('seq')->paginate(300)->withQueryString();
 
         return view('reports.distribution', [
-            'rows'    => $rows,
+            'rows' => $rows,
             'filters' => $request->all(),
         ]);
     }
@@ -94,7 +93,7 @@ class ReportController extends Controller
         $rows = $query->orderBy('truck')->orderBy('seq')->get();
 
         $pdf = Pdf::loadView('reports.pdf.distribution', [
-            'rows'    => $rows,
+            'rows' => $rows,
             'filters' => $request->all(),
         ])->setPaper('A4', 'landscape');
 
@@ -119,12 +118,12 @@ class ReportController extends Controller
             $query->where('pub_code', $pubCode);
         }
 
-        $summary = $query->selectRaw("
+        $summary = $query->selectRaw('
                 truck,
                 COUNT(*) as total_stops,
                 SUM(CAST(draw AS INT)) as total_draw,
                 SUM(CAST(returns AS INT)) as total_returns
-            ")
+            ')
             ->groupBy('truck')
             ->orderBy('truck')
             ->get();
@@ -158,12 +157,12 @@ class ReportController extends Controller
             $query->where('pub_code', $pubCode);
         }
 
-        $summary = $query->selectRaw("
+        $summary = $query->selectRaw('
                 truck,
                 COUNT(*) as total_stops,
                 SUM(CAST(draw AS INT)) as total_draw,
                 SUM(CAST(returns AS INT)) as total_returns
-            ")
+            ')
             ->groupBy('truck')
             ->orderBy('truck')
             ->get();
@@ -190,21 +189,21 @@ class ReportController extends Controller
             : Carbon::now()->endOfDay();
 
         // per-day totals
-        $perDay = ManifestRow::selectRaw("
+        $perDay = ManifestRow::selectRaw('
                 CONVERT(date, pub_date) as date,
                 SUM(CAST(draw AS INT)) as total_draw,
                 SUM(CAST(returns AS INT)) as total_returns
-            ")
+            ')
             ->whereBetween('pub_date', [$startDate, $endDate])
             ->groupBy(DB::raw('CONVERT(date, pub_date)'))
             ->orderBy(DB::raw('CONVERT(date, pub_date)'))
             ->get();
 
-        $perTruck = ManifestRow::selectRaw("
+        $perTruck = ManifestRow::selectRaw('
                 truck,
                 SUM(CAST(draw AS INT)) as total_draw,
                 SUM(CAST(returns AS INT)) as total_returns
-            ")
+            ')
             ->whereBetween('pub_date', [$startDate, $endDate])
             ->groupBy('truck')
             ->orderBy('truck')
@@ -212,9 +211,9 @@ class ReportController extends Controller
 
         return view('reports.dashboard', [
             'startDate' => $startDate,
-            'endDate'   => $endDate,
-            'perDay'    => $perDay,
-            'perTruck'  => $perTruck,
+            'endDate' => $endDate,
+            'perDay' => $perDay,
+            'perTruck' => $perTruck,
         ]);
     }
 }

@@ -22,11 +22,11 @@ class ManifestUpload extends Model
     ];
 
     protected $casts = [
-        'pub_date'        => 'date',
-        'combined_at'     => 'datetime',
-        'total_rows'      => 'integer',
-        'imported_rows'   => 'integer',
-        'skipped_rows'    => 'integer',
+        'pub_date' => 'date',
+        'combined_at' => 'datetime',
+        'total_rows' => 'integer',
+        'imported_rows' => 'integer',
+        'skipped_rows' => 'integer',
     ];
 
     public function rows()

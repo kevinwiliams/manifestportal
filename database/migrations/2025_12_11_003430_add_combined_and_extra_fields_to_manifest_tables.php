@@ -10,22 +10,22 @@ return new class extends Migration
     {
         // Add combined manifest fields
         Schema::table('manifest_uploads', function (Blueprint $table) {
-            if (!Schema::hasColumn('manifest_uploads', 'combined_file_path')) {
+            if (! Schema::hasColumn('manifest_uploads', 'combined_file_path')) {
                 $table->string('combined_file_path')->nullable()->after('stored_path');
             }
 
-            if (!Schema::hasColumn('manifest_uploads', 'combined_at')) {
+            if (! Schema::hasColumn('manifest_uploads', 'combined_at')) {
                 $table->timestamp('combined_at')->nullable()->after('combined_file_path');
             }
         });
 
         // Add extra detail fields from second file
         Schema::table('manifest_rows', function (Blueprint $table) {
-            if (!Schema::hasColumn('manifest_rows', 'truck_descr')) {
+            if (! Schema::hasColumn('manifest_rows', 'truck_descr')) {
                 $table->string('truck_descr')->nullable()->after('pub_date');
             }
 
-            if (!Schema::hasColumn('manifest_rows', 'drop_instructions')) {
+            if (! Schema::hasColumn('manifest_rows', 'drop_instructions')) {
                 $table->text('drop_instructions')->nullable()->after('truck_descr');
             }
         });

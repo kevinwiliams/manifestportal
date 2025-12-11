@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\ManifestUpload;
-use App\Models\ManifestRow;
-use Illuminate\Support\Facades\DB;
 use App\Imports\ManifestImport;
+use App\Models\ManifestRow;
+use App\Models\ManifestUpload;
 use App\Services\FinalizeManifestService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class UploadController extends Controller
 {
     public function index()
     {
         $uploads = ManifestUpload::orderByDesc('created_at')->paginate(20);
+
         return view('uploads.index', compact('uploads'));
     }
 
@@ -25,7 +26,7 @@ class UploadController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'file'     => 'required|file|mimes:csv,txt,xlsx,xls',
+            'file' => 'required|file|mimes:csv,txt,xlsx,xls',
         ]);
 
         // Try to auto-detect pub_code/pub_date from the uploaded file
@@ -45,11 +46,11 @@ class UploadController extends Controller
         try {
             // Create upload record
             $upload = ManifestUpload::create([
-                'pub_code'      => $pubCode,
-                'pub_date'      => $pubDate,
-                'status'        => 'pending',
+                'pub_code' => $pubCode,
+                'pub_date' => $pubDate,
+                'status' => 'pending',
                 'imported_rows' => 0,
-                'user_id'       => auth()->id(),
+                'user_id' => auth()->id(),
                 'original_filename' => $request->file('file')->getClientOriginalName(),
             ]);
 
@@ -75,6 +76,7 @@ class UploadController extends Controller
 
         } catch (\Throwable $e) {
             DB::rollBack();
+
             return back()->withErrors(['upload' => $e->getMessage()]);
         }
     }
@@ -111,7 +113,7 @@ class UploadController extends Controller
             ->where('pub_code', '!=', $upload->pub_code)
             ->first();
 
-        if (!$otherUpload) {
+        if (! $otherUpload) {
             // No second pub code yet – remains pending
             return;
         }

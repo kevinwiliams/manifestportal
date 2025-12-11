@@ -12,14 +12,7 @@ class EmailQueueService
     /**
      * Queue a simple message using defaults from config/emailqueue.php.
      *
-     * @param  string|array|null  $to
-     * @param  string             $subject
-     * @param  string             $body
-     * @param  string|array|null  $cc
-     * @param  string|array|null  $bcc
-     * @param  string|null        $from
-     * @param  array              $extra   Extra key=>value pairs to append to payload
-     * @return void
+     * @param  array  $extra  Extra key=>value pairs to append to payload
      */
     public static function queueMessage(
         string|array|null $to,
@@ -31,21 +24,22 @@ class EmailQueueService
         array $extra = []
     ): void {
         // Master toggle
-        if (!Config::get('emailqueue.enabled', true)) {
+        if (! Config::get('emailqueue.enabled', true)) {
             self::log('EmailQueue disabled - not queuing message', [
-                'to'      => $to,
+                'to' => $to,
                 'subject' => $subject,
             ]);
+
             return;
         }
 
         $connection = Config::get('emailqueue.connection', 'adhoc');
-        $procedure  = Config::get('emailqueue.procedure', 'dbo.InsertMessageQueue');
-        $encoding   = Config::get('emailqueue.encoding', 'UTF-8');
+        $procedure = Config::get('emailqueue.procedure', 'dbo.InsertMessageQueue');
+        $encoding = Config::get('emailqueue.encoding', 'UTF-8');
 
         // Normalize addresses: accept array or string
-        $to  = self::normalizeAddressList($to, Config::get('emailqueue.default_to'));
-        $cc  = self::normalizeAddressList($cc, Config::get('emailqueue.default_cc'));
+        $to = self::normalizeAddressList($to, Config::get('emailqueue.default_to'));
+        $cc = self::normalizeAddressList($cc, Config::get('emailqueue.default_cc'));
         $bcc = self::normalizeAddressList($bcc, Config::get('emailqueue.default_bcc'));
 
         $from = $from ?: Config::get('emailqueue.default_from');
@@ -54,12 +48,12 @@ class EmailQueueService
         // encoding=UTF-8&to=...&bcc=...&cc=...&from=...&subject=...&msgbody=...
         $payloadArray = array_merge([
             'encoding' => $encoding,
-            'to'       => $to,
-            'bcc'      => $bcc,
-            'cc'       => $cc,
-            'from'     => $from,
-            'subject'  => $subject,
-            'msgbody'  => $body,
+            'to' => $to,
+            'bcc' => $bcc,
+            'cc' => $cc,
+            'from' => $from,
+            'subject' => $subject,
+            'msgbody' => $body,
         ], $extra);
 
         $payload = http_build_query($payloadArray);
@@ -67,12 +61,12 @@ class EmailQueueService
         // Log the payload (without body if you prefer)
         self::log('Queuing email via messagequeue stored procedure', [
             'connection' => $connection,
-            'procedure'  => $procedure,
-            'to'         => $to,
-            'cc'         => $cc,
-            'bcc'        => $bcc,
-            'from'       => $from,
-            'subject'    => $subject,
+            'procedure' => $procedure,
+            'to' => $to,
+            'cc' => $cc,
+            'bcc' => $bcc,
+            'from' => $from,
+            'subject' => $subject,
             // 'payload' => $payload, // uncomment if you want full payload logged
         ]);
 
@@ -101,8 +95,8 @@ class EmailQueueService
         $subject = "Manifest upload for {$pubDate} (Pub Code {$upload->pub_code})";
 
         $bodyLines = [
-            "A manifest upload has completed.",
-            "",
+            'A manifest upload has completed.',
+            '',
             "Upload ID: {$upload->id}",
             "Publication Date: {$pubDate}",
             "Publication Code: {$upload->pub_code}",
@@ -117,8 +111,8 @@ class EmailQueueService
         $extra = [
             'meta' => json_encode([
                 'upload_id' => $upload->id,
-                'pub_date'  => $upload->pub_date,
-                'pub_code'  => $upload->pub_code,
+                'pub_date' => $upload->pub_date,
+                'pub_code' => $upload->pub_code,
             ]),
         ];
 

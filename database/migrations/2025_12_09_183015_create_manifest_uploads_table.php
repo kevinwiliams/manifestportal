@@ -21,7 +21,7 @@ return new class extends Migration
             $table->integer('total_rows')->default(0);
             $table->integer('imported_rows')->default(0);
             $table->integer('skipped_rows')->default(0);
-            $table->enum('status', ['pending','completed','failed'])->default('pending');
+            $table->enum('status', ['pending', 'completed', 'failed'])->default('pending');
             $table->text('error_message')->nullable();
             $table->timestamps();
 

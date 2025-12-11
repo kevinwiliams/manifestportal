@@ -2,10 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\ManifestUpload;
 use App\Models\ManifestRow;
+use App\Models\ManifestUpload;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
 
 class FinalizeManifestService
 {
@@ -33,11 +32,11 @@ class FinalizeManifestService
             ->get();
 
         // Write combined CSV file
-        $filename = 'combined_manifests/manifest_' . str_replace('-', '', $pubDate) . '.csv';
+        $filename = 'combined_manifests/manifest_'.str_replace('-', '', $pubDate).'.csv';
         $handle = fopen('php://temp', 'r+');
         fputcsv($handle, [
-            'Truck','Name','Drop Address','Route','Type','Seq',
-            'Account','Group','Draw','Returns','Pub Code','Pub Date',
+            'Truck', 'Name', 'Drop Address', 'Route', 'Type', 'Seq',
+            'Account', 'Group', 'Draw', 'Returns', 'Pub Code', 'Pub Date',
         ]);
 
         foreach ($rows as $r) {
@@ -65,8 +64,8 @@ class FinalizeManifestService
 
         // Mark uploads as processed
         ManifestUpload::whereIn('id', $uploadIds)->update([
-            'status'       => 'processed',
-            'combined_at'  => now(),
+            'status' => 'processed',
+            'combined_at' => now(),
             'combined_file_path' => $filename,
         ]);
 

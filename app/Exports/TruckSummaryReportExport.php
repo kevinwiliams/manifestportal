@@ -8,11 +8,12 @@ use Illuminate\Contracts\Support\Responsable;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class TruckSummaryReportExport implements FromCollection, WithHeadings, Responsable
+class TruckSummaryReportExport implements FromCollection, Responsable, WithHeadings
 {
     public string $fileName = 'truck-summary-report.xlsx';
 
     protected ?string $pubDate;
+
     protected ?string $pubCode;
 
     public function __construct(array $filters = [])
@@ -48,12 +49,12 @@ class TruckSummaryReportExport implements FromCollection, WithHeadings, Responsa
         }
 
         return $query
-            ->selectRaw("
+            ->selectRaw('
                 truck,
                 COUNT(*) as total_stops,
                 SUM(CAST(draw AS INT)) as total_draw,
                 SUM(CAST(returns AS INT)) as total_returns
-            ")
+            ')
             ->groupBy('truck')
             ->orderBy('truck')
             ->get();

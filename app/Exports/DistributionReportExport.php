@@ -8,23 +8,27 @@ use Illuminate\Contracts\Support\Responsable;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class DistributionReportExport implements FromCollection, WithHeadings, Responsable
+class DistributionReportExport implements FromCollection, Responsable, WithHeadings
 {
     public string $fileName = 'distribution-report.xlsx';
 
     protected ?string $pubDate;
+
     protected ?string $pubCode;
+
     protected ?string $truck;
+
     protected ?string $route;
+
     protected ?string $type;
 
     public function __construct(array $filters = [])
     {
         $this->pubDate = $filters['pub_date'] ?? null;
         $this->pubCode = $filters['pub_code'] ?? null;
-        $this->truck   = $filters['truck'] ?? null;
-        $this->route   = $filters['route'] ?? null;
-        $this->type    = $filters['type'] ?? null;
+        $this->truck = $filters['truck'] ?? null;
+        $this->route = $filters['route'] ?? null;
+        $this->type = $filters['type'] ?? null;
 
         if ($this->pubDate) {
             $this->pubDate = Carbon::parse($this->pubDate)->format('Y-m-d');

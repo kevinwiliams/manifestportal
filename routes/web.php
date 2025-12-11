@@ -1,14 +1,13 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\UploadController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TruckMappingController;
+use App\Http\Controllers\UploadController;
 use App\Models\ManifestUpload;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
-
 
 /*
 |--------------------------------------------------------------------------
@@ -20,7 +19,7 @@ Route::get('/', function () {
     return redirect()->route('dashboard');
 });
 
-Route::get('/uploads/{upload}/download/{file}', function(ManifestUpload $upload, $file) {
+Route::get('/uploads/{upload}/download/{file}', function (ManifestUpload $upload, $file) {
     // Require authentication and ensure the current user owns the upload.
     if (! auth()->check() || $upload->user_id !== auth()->id()) {
         abort(403);
@@ -57,7 +56,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | Uploads
@@ -66,13 +64,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::middleware(['auth'])->prefix('uploads')->name('uploads.')->group(function () {
 
-    Route::get('/',          [UploadController::class, 'index'])->name('index');
-    Route::get('/new',       [UploadController::class, 'create'])->name('create');
-    Route::post('/detect',   [UploadController::class, 'detect'])->name('detect');
-    Route::post('/new',      [UploadController::class, 'store'])->name('store');
-    Route::get('/{upload}',  [UploadController::class, 'show'])->name('show');
+    Route::get('/', [UploadController::class, 'index'])->name('index');
+    Route::get('/new', [UploadController::class, 'create'])->name('create');
+    Route::post('/detect', [UploadController::class, 'detect'])->name('detect');
+    Route::post('/new', [UploadController::class, 'store'])->name('store');
+    Route::get('/{upload}', [UploadController::class, 'show'])->name('show');
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -96,7 +93,6 @@ Route::middleware(['auth', 'can:viewReports'])
         Route::get('/dashboard', [ReportController::class, 'dashboard'])->name('dashboard');
     });
 
-
 /*
 |--------------------------------------------------------------------------
 | Admin
@@ -108,6 +104,5 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('truck-mappings', TruckMappingController::class)
         ->except(['show']);
 });
-
 
 require __DIR__.'/auth.php';
