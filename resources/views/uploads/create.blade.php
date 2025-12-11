@@ -62,6 +62,26 @@ document.addEventListener('DOMContentLoaded', function () {
         const file = input.files && input.files[0];
         if (!file) return;
 
+        console.log('[upload] file selected:', { name: file.name, size: file.size, type: file.type, lastModified: file.lastModified });
+
+        // If it's a text/csv file, read a small preview for debugging
+        if (/\.(csv|txt)$/i.test(file.name) || file.type === 'text/csv' || file.type === 'text/plain') {
+            const reader = new FileReader();
+            reader.onload = function (ev) {
+                const txt = (ev.target.result || '').toString();
+                console.log('[upload] file preview (first 1000 chars):', txt.slice(0, 1000));
+            };
+            reader.onerror = function (err) {
+                console.warn('[upload] file preview read error', err);
+            };
+            // read a small portion
+            try {
+                reader.readAsText(file.slice(0, 1024 * 50));
+            } catch (readErr) {
+                console.warn('[upload] file preview read exception', readErr);
+            }
+        }
+
         // reset
         loading.classList.remove('hidden');
         result.classList.add('hidden');
@@ -74,20 +94,39 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
+            // For debugging, log FormData entries if supported
+            try {
+                for (const pair of fd.entries()) {
+                    console.log('[upload][detect] formData entry:', pair[0], pair[1]);
+                }
+            } catch (fdErr) {
+                console.warn('[upload][detect] could not enumerate FormData entries', fdErr);
+            }
+
             const res = await fetch("{{ route('uploads.detect') }}", {
                 method: 'POST',
                 headers: { 'X-CSRF-TOKEN': token },
                 body: fd,
             });
 
+            console.log('[upload][detect] fetch response status:', res.status, res.statusText);
+
             loading.classList.add('hidden');
 
             if (!res.ok) {
+                // try to show error body for debugging
+                try {
+                    const txt = await res.text();
+                    console.error('[upload][detect] non-ok response body:', txt);
+                } catch (readErr) {
+                    console.error('[upload][detect] non-ok and could not read body', readErr);
+                }
                 err.classList.remove('hidden');
                 return;
             }
 
             const data = await res.json();
+            console.log('[upload][detect] response json:', data);
             if (!data.meta) {
                 none.classList.remove('hidden');
                 return;
@@ -103,6 +142,29 @@ document.addEventListener('DOMContentLoaded', function () {
             err.classList.remove('hidden');
         }
     });
+
+    // Log form submit contents so we can see what will be sent to the server
+    const form = document.querySelector('form[action="{{ route('uploads.store') }}"]');
+    if (form) {
+        form.addEventListener('submit', function (ev) {
+            try {
+                const sfd = new FormData(form);
+                console.log('[upload][submit] form submit - enumerating fields:');
+                for (const pair of sfd.entries()) {
+                    if (pair[1] instanceof File) {
+                        console.log('[upload][submit] field:', pair[0], 'File:', { name: pair[1].name, size: pair[1].size, type: pair[1].type });
+                    } else {
+                        console.log('[upload][submit] field:', pair[0], pair[1]);
+                    }
+                }
+            } catch (err) {
+                console.warn('[upload][submit] could not enumerate form data', err);
+            }
+            // allow form to submit normally after logging
+        });
+    } else {
+        console.warn('[upload] upload form not found for submit logging');
+    }
 });
 </script>
 @endpush
