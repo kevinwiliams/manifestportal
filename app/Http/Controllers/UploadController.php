@@ -122,9 +122,16 @@ class UploadController extends Controller
     public static function detectMetadata(UploadedFile $file): array
     {
         try {
-            // Force CSV reading
-            $rows = Excel::toArray([], $file, null, \Maatwebsite\Excel\Excel::CSV)[0] ?? [];
+            // Let the Excel reader auto-detect format where possible (handles xlsx/csv).
+            $sheets = Excel::toArray([], $file);
+            $rows = $sheets[0] ?? [];
+            // Fallback: if no rows returned, try forcing CSV parsing (some CSV-like xlsx may need this)
+            if (empty($rows)) {
+                $sheets = Excel::toArray([], $file, null, \Maatwebsite\Excel\Excel::CSV);
+                $rows = $sheets[0] ?? [];
+            }
         } catch (\Throwable $e) {
+            \Log::warning('[uploads.detectMetadata] Excel::toArray failed', ['exception' => $e->getMessage()]);
             return [];
         }
 
@@ -140,6 +147,7 @@ class UploadController extends Controller
         $pubDateIndex = array_search('pub date', $header);
 
         if ($pubCodeIndex === false || $pubDateIndex === false) {
+            \Log::info('[uploads.detectMetadata] required headers not found', ['header' => $header]);
             return [];
         }
 
