@@ -5,7 +5,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TruckMappingController;
+use App\Models\ManifestUpload;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 
 /*
@@ -19,6 +21,11 @@ Route::get('/', function () {
 });
 
 Route::get('/uploads/{upload}/download/{file}', function(ManifestUpload $upload, $file) {
+    // Require authentication and ensure the current user owns the upload.
+    if (! auth()->check() || $upload->user_id !== auth()->id()) {
+        abort(403);
+    }
+
     if ($file === 'file1' && $upload->file1_path) {
         return Storage::download($upload->file1_path, $upload->file1_name);
     }
@@ -26,7 +33,7 @@ Route::get('/uploads/{upload}/download/{file}', function(ManifestUpload $upload,
         return Storage::download($upload->file2_path, $upload->file2_name);
     }
     abort(404);
-})->name('uploads.download');
+})->name('uploads.download')->middleware('auth');
 
 /*
 |--------------------------------------------------------------------------

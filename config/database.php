@@ -101,38 +101,35 @@ return [
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),
-            'host' => env('DB_HOST', '172.16.3.124'),
+            'host' => env('DB_HOST', 'host.docker.internal'),
             'port' => env('DB_PORT', '1433'),
             'database' => env('DB_DATABASE', 'ManifestPortal'),
-            'username' => env('DB_USERNAME', 'adhocuser'),
-            'password' => env('DB_PASSWORD', '1234567'),
+            'username' => env('DB_USERNAME', 'sa'),
+            'password' => env('DB_PASSWORD', ''),
             'charset' => env('DB_CHARSET', 'utf8'),
             'prefix' => '',
             'prefix_indexes' => true,
-			'ODBCDriver' => 'ODBC Driver 17 for SQL Server',
-            // 'encrypt' => env('DB_ENCRYPT', 'yes'),
-            // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
-			
-			'options' => [
-				'Encrypt' => 'yes',
-				'TrustServerCertificate' => 'yes',
-			],
+            'ODBCDriver' => env('DB_ODBC_DRIVER', 'ODBC Driver 17 for SQL Server'),
+            'options' => [
+                // Control encryption/trust with env vars. In production ensure encrypt is enabled and
+                // trust server certificate is set appropriately.
+                'Encrypt' => env('DB_ENCRYPT', 'yes'),
+                'TrustServerCertificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
+            ],
         ],
 
         'adhoc' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),
-            'host' => env('DB_HOST', '172.16.3.124'),
+            'host' => env('DB_HOST', 'host.docker.internal'),
             'port' => env('DB_PORT', '1433'),
-            'database' => env('DB_DATABASE', 'adhoc'),
-            'username' => env('DB_USERNAME', 'adhocuser'),
-            'password' => env('DB_PASSWORD', '1234567'),
+            'database' => env('DB_ADHOC_DATABASE', 'adhoc'),
+            'username' => env('DB_ADHOC_USERNAME', 'sa'),
+            'password' => env('DB_ADHOC_PASSWORD', ''),
             'charset' => env('DB_CHARSET', 'utf8'),
             'prefix' => '',
             'prefix_indexes' => true,
-			'ODBCDriver' => 'ODBC Driver 17 for SQL Server',
-            // 'encrypt' => env('DB_ENCRYPT', 'yes'),
-            // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
+            'ODBCDriver' => env('DB_ODBC_DRIVER', 'ODBC Driver 17 for SQL Server'),
         ],
 
     ],
