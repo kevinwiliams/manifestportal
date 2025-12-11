@@ -240,7 +240,7 @@ class UploadController extends Controller
         ]);
 
         // Finalize (combine data, mark processed, send email)
-        FinalizeManifestService::finishForDate($upload->pub_date);
+        FinalizeManifestService::finishForDate($upload->pub_date->format('Y-m-d'));
     }
 
     public function show(ManifestUpload $upload)

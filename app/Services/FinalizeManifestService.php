@@ -32,7 +32,9 @@ class FinalizeManifestService
             ->get();
 
         // Write combined CSV file
-        $filename = 'combined_manifests/manifest_'.str_replace('-', '', $pubDate).'.csv';
+        // Ensure pubDate is in YYYY-MM-DD format (may come in as Carbon object)
+        $pubDateFormatted = is_string($pubDate) ? $pubDate : $pubDate->format('Y-m-d');
+        $filename = 'combined_manifests/manifest_'.str_replace('-', '', $pubDateFormatted).'.csv';
         $handle = fopen('php://temp', 'r+');
         fputcsv($handle, [
             'Truck', 'Name', 'Drop Address', 'Route', 'Type', 'Seq',
@@ -60,6 +62,8 @@ class FinalizeManifestService
         $csvContent = stream_get_contents($handle);
         fclose($handle);
 
+        // Ensure the directory exists
+        Storage::makeDirectory('combined_manifests', 0755, true, true);
         Storage::put($filename, $csvContent);
 
         // Mark uploads as completed
