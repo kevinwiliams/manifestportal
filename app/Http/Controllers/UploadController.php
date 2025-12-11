@@ -179,8 +179,20 @@ class UploadController extends Controller
         $rawDate = $row[$pubDateIndex] ?? '';
 
         try {
-            $pubDate = \Carbon\Carbon::parse($rawDate)->format('Y-m-d');
+            // Excel files may return dates in MM/DD/YYYY format, or as numeric serials.
+            // Try parsing with explicit format first, then fall back to parse().
+            if (preg_match('/^\d{1,2}\/\d{1,2}\/\d{4}$/', $rawDate)) {
+                // Explicit MM/DD/YYYY format
+                $pubDate = \Carbon\Carbon::createFromFormat('m/d/Y', $rawDate)->format('Y-m-d');
+            } else {
+                // Fallback to Carbon's auto-parse (handles Excel serial dates, ISO formats, etc.)
+                $pubDate = \Carbon\Carbon::parse($rawDate)->format('Y-m-d');
+            }
         } catch (\Throwable $e) {
+            \Log::warning('[uploads.detectMetadata] failed to parse date', [
+                'rawDate' => $rawDate,
+                'exception' => $e->getMessage(),
+            ]);
             $pubDate = null;
         }
 
