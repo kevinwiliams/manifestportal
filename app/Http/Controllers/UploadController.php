@@ -8,6 +8,7 @@ use App\Models\ManifestUpload;
 use App\Services\FinalizeManifestService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UploadController extends Controller
 {
@@ -46,12 +47,14 @@ class UploadController extends Controller
         try {
             // Create upload record
             $upload = ManifestUpload::create([
-                'pub_code' => $pubCode,
-                'pub_date' => $pubDate,
-                'status' => 'pending',
-                'imported_rows' => 0,
-                'user_id' => auth()->id(),
+                'pub_code'          => $pubCode,
+                'pub_date'          => $pubDate,
+                'status'            => 'pending',
+                'total_rows'        => 0,
+                'imported_rows'     => 0,
+                'skipped_rows'      => 0,
                 'original_filename' => $request->file('file')->getClientOriginalName(),
+                'user_id'           => auth()->id(),
             ]);
 
             // Store original file
@@ -60,8 +63,12 @@ class UploadController extends Controller
             $upload->save();
 
             // Import rows: instantiate with the upload and pass stored path
-            $service = new ManifestImport($upload);
-            $importCount = $service->import($upload, $path);
+            // $service = new ManifestImport($upload);
+            // $importCount = $service->import($upload, $path);
+            Excel::import(new ManifestImport($upload), $request->file('file'));
+
+            $upload->refresh(); // reload counts updated by ManifestImport
+            $importCount = $upload->imported_rows;
 
             $upload->update(['imported_rows' => $importCount]);
 
