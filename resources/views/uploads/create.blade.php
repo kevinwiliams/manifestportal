@@ -43,7 +43,6 @@
 
     </div>
 
-</x-app-layout>
 
 @push('scripts')
 <script>
@@ -188,3 +187,5 @@ if (document.readyState === 'loading') {
 }
 </script>
 @endpush
+</x-app-layout>
+
