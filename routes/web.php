@@ -4,6 +4,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TruckMappingController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\UploadController;
 use App\Models\ManifestUpload;
 use Illuminate\Support\Facades\Route;
@@ -24,12 +25,16 @@ Route::get('/uploads/{upload}/download/{file}', function (ManifestUpload $upload
     if (! auth()->check() || $upload->user_id !== auth()->id()) {
         abort(403);
     }
-
     if ($file === 'file1' && $upload->file1_path) {
         return Storage::download($upload->file1_path, $upload->file1_name);
     }
     if ($file === 'file2' && $upload->file2_path) {
         return Storage::download($upload->file2_path, $upload->file2_name);
+    }
+    // Combined manifest download
+    if ($file === 'combined' && ($upload->combined_file_path ?? false)) {
+        $downloadName = basename($upload->combined_file_path);
+        return Storage::download($upload->combined_file_path, $downloadName);
     }
     abort(404);
 })->name('uploads.download')->middleware('auth');
@@ -103,6 +108,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     Route::resource('truck-mappings', TruckMappingController::class)
         ->except(['show']);
+
+    // Admin user management
+    Route::resource('users', AdminUserController::class)->except(['show']);
 });
 
 require __DIR__.'/auth.php';
