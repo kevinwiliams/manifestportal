@@ -7,6 +7,7 @@ use App\Http\Controllers\TruckMappingController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\UploadController;
 use App\Models\ManifestUpload;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -21,8 +22,14 @@ Route::get('/', function () {
 });
 
 Route::get('/uploads/{upload}/download/{file}', function (ManifestUpload $upload, $file) {
-    // Require authentication and ensure the current user owns the upload.
-    if (! auth()->check() || $upload->user_id !== auth()->id()) {
+    // Require authentication and ensure the current user owns the upload or is an admin.
+    if (! auth()->check() || (auth()->id() !== $upload->user_id && ! optional(auth()->user())->is_admin)) {
+        Log::warning('[uploads.download] forbidden', [
+            'user_id' => auth()->id(),
+            'upload_owner' => $upload->user_id,
+            'upload_id' => $upload->id,
+            'route_param_file' => $file,
+        ]);
         abort(403);
     }
     if ($file === 'file1' && $upload->file1_path) {
