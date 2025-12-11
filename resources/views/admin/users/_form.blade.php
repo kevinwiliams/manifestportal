@@ -18,6 +18,11 @@
     </div>
 
     <div>
+        <label class="block text-sm font-medium">Confirm Password</label>
+        <input type="password" name="password_confirmation" class="w-full border rounded px-3 py-2" {{ isset($user) ? '' : 'required' }} />
+    </div>
+
+    <div>
         <label class="inline-flex items-center">
             <input type="checkbox" name="is_admin" value="1" {{ old('is_admin', $user->is_admin ?? false) ? 'checked' : '' }} />
             <span class="ml-2">Admin</span>
