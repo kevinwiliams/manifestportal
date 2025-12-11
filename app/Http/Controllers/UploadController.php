@@ -100,7 +100,12 @@ class UploadController extends Controller
         try {
             $meta = self::detectMetadata($request->file('file'));
         } catch (\Throwable $e) {
-            return response()->json(['error' => 'Failed to parse file for metadata.'], 422);
+            \Log::error('[uploads.detect] detectMetadata exception', [
+                'exception' => get_class($e),
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['error' => 'Failed to parse file for metadata: ' . $e->getMessage()], 422);
         }
 
         if (empty($meta)) {
