@@ -28,17 +28,27 @@
                         Reports
                     </x-nav-link>
 
-                    <!-- Admin Section -->
-                    <x-nav-link :href="route('admin.truck-mappings.index')" 
-                        :active="request()->routeIs('admin.truck-mappings.*')">
-                        Admin
-                    </x-nav-link>
+                    <!-- Admin Dropdown -->
+                    <x-dropdown align="left" width="48">
+                        <x-slot name="trigger">
+                            <button class="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700">
+                                <div>Admin</div>
+                                <svg class="ml-2 h-4 w-4" viewBox="0 0 20 20"><path fill="currentColor" d="M5.5 7l4.5 4.5L14.5 7"/></svg>
+                            </button>
+                        </x-slot>
 
-                    @if(optional(Auth::user())->is_admin)
-                        <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
-                            Users
-                        </x-nav-link>
-                    @endif
+                        <x-slot name="content">
+                            <x-dropdown-link :href="route('admin.truck-mappings.index')">
+                                Truck Mappings
+                            </x-dropdown-link>
+
+                            @if(optional(Auth::user())->is_admin)
+                                <x-dropdown-link :href="route('admin.users.index')">
+                                    Users
+                                </x-dropdown-link>
+                            @endif
+                        </x-slot>
+                    </x-dropdown>
 
                 </div>
             </div>
@@ -105,15 +115,18 @@
                 Reports
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('admin.truck-mappings.index')" 
-                :active="request()->routeIs('admin.truck-mappings.*')">
-                Admin
-            </x-responsive-nav-link>
-            @if(optional(Auth::user())->is_admin)
-                <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
-                    Users
+            <div class="pl-4">
+                <div class="text-xs font-semibold text-gray-400 uppercase px-3">Admin</div>
+                <x-responsive-nav-link :href="route('admin.truck-mappings.index')" 
+                    :active="request()->routeIs('admin.truck-mappings.*')">
+                    Truck Mappings
                 </x-responsive-nav-link>
-            @endif
+                @if(optional(Auth::user())->is_admin)
+                    <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                        Users
+                    </x-responsive-nav-link>
+                @endif
+            </div>
         </div>
 
         <!-- Mobile Profile -->
