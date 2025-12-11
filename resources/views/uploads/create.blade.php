@@ -47,7 +47,9 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+// Upload preview script (robust init so it logs even if script loads after DOMContentLoaded)
+function initUploadPreview() {
+    console.log('[upload] initUploadPreview running');
     const input = document.getElementById('manifest-file-input');
     const loading = document.getElementById('preview-loading');
     const result = document.getElementById('preview-result');
@@ -56,7 +58,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const pubCodeEl = document.getElementById('preview-pub-code');
     const pubDateEl = document.getElementById('preview-pub-date');
 
-    if (!input) return;
+    if (!input) {
+        console.warn('[upload] manifest-file-input not found in DOM');
+        return;
+    }
 
     input.addEventListener('change', async function (e) {
         const file = input.files && input.files[0];
@@ -165,6 +170,13 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
         console.warn('[upload] upload form not found for submit logging');
     }
-});
+}
+
+// Ensure init runs whether DOMContentLoaded has fired already or not
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initUploadPreview);
+} else {
+    try { initUploadPreview(); } catch (e) { console.error('[upload] initUploadPreview error', e); }
+}
 </script>
 @endpush
