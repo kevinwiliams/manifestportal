@@ -179,18 +179,34 @@ class UploadController extends Controller
         $rawDate = $row[$pubDateIndex] ?? '';
 
         try {
-            // Excel files may return dates in MM/DD/YYYY format, or as numeric serials.
-            // Try parsing with explicit format first, then fall back to parse().
-            if (preg_match('/^\d{1,2}\/\d{1,2}\/\d{4}$/', $rawDate)) {
+            // Excel files may return dates as:
+            // 1. Numeric serials (e.g., 45627 for Dec 1, 2025)
+            // 2. MM/DD/YYYY text format
+            // 3. ISO format strings
+            
+            // Check if it's a numeric Excel serial (integer or float)
+            if (is_numeric($rawDate)) {
+                $numericDate = (int)$rawDate;
+                // Excel serial dates start at 1 for Jan 1, 1900
+                // Convert to Unix timestamp: (serial - 25569) * 86400 gives seconds since Unix epoch
+                // (25569 is the Excel serial for Jan 1, 1970)
+                if ($numericDate > 0) {
+                    $unixTimestamp = ($numericDate - 25569) * 86400;
+                    $pubDate = \Carbon\Carbon::createFromTimestamp($unixTimestamp)->format('Y-m-d');
+                } else {
+                    $pubDate = null;
+                }
+            } elseif (preg_match('/^\d{1,2}\/\d{1,2}\/\d{4}$/', $rawDate)) {
                 // Explicit MM/DD/YYYY format
                 $pubDate = \Carbon\Carbon::createFromFormat('m/d/Y', $rawDate)->format('Y-m-d');
             } else {
-                // Fallback to Carbon's auto-parse (handles Excel serial dates, ISO formats, etc.)
+                // Fallback to Carbon's auto-parse (handles ISO formats, etc.)
                 $pubDate = \Carbon\Carbon::parse($rawDate)->format('Y-m-d');
             }
         } catch (\Throwable $e) {
             \Log::warning('[uploads.detectMetadata] failed to parse date', [
                 'rawDate' => $rawDate,
+                'type' => gettype($rawDate),
                 'exception' => $e->getMessage(),
             ]);
             $pubDate = null;
