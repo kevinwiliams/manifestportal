@@ -34,7 +34,7 @@
                     </div>
                 </div>
 
-                <button class="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                <button type="submit" class="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                     Upload File
                 </button>
             </div>
@@ -98,6 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
             result.classList.remove('hidden');
 
         } catch (e) {
+            console.error('Metadata detection error:', e);
             loading.classList.add('hidden');
             err.classList.remove('hidden');
         }
