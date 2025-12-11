@@ -9,6 +9,7 @@ use App\Services\FinalizeManifestService;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
 class UploadController extends Controller
@@ -47,6 +48,9 @@ class UploadController extends Controller
         DB::beginTransaction();
 
         try {
+            // Store original file first so we can provide a non-null stored_path
+            $path = $request->file('file')->store('uploads');
+
             // Create upload record
             $upload = ManifestUpload::create([
                 'pub_code'          => $pubCode,
@@ -56,13 +60,28 @@ class UploadController extends Controller
                 'imported_rows'     => 0,
                 'skipped_rows'      => 0,
                 'original_filename' => $request->file('file')->getClientOriginalName(),
+                'stored_path'       => $path,
                 'user_id'           => auth()->id(),
             ]);
 
-            // Store original file
-            $path = $request->file('file')->store("uploads/{$upload->id}");
-            $upload->stored_path = $path;
-            $upload->save();
+            // Move stored file into per-upload folder `uploads/{id}/` to keep files organized
+            try {
+                $newDir = "uploads/{$upload->id}";
+                Storage::makeDirectory($newDir);
+                $filename = basename($path);
+                $newPath = "{$newDir}/{$filename}";
+
+                if (Storage::exists($path)) {
+                    Storage::move($path, $newPath);
+                    // Update record with new path
+                    $upload->stored_path = $newPath;
+                    $upload->save();
+                } else {
+                    \Log::warning('[uploads.store] stored file not found for moving', ['path' => $path]);
+                }
+            } catch (\Throwable $e) {
+                \Log::error('[uploads.store] failed moving file to per-upload folder', ['exception' => $e->getMessage()]);
+            }
 
             // Import rows: instantiate with the upload and pass stored path
             // $service = new ManifestImport($upload);
