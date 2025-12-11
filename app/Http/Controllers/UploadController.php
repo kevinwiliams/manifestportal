@@ -221,7 +221,7 @@ class UploadController extends Controller
 
     /**
      * If another upload with the same date and a different pub_code exists,
-     * mark them as ready and finalize the manifest.
+     * mark them as completed and finalize the manifest.
      */
     private function evaluateUploadStatus(ManifestUpload $upload): void
     {
@@ -234,9 +234,9 @@ class UploadController extends Controller
             return;
         }
 
-        // We have at least 2 different pub_codes for this date → mark as ready
+        // We have at least 2 different pub_codes for this date → mark as completed
         ManifestUpload::where('pub_date', $upload->pub_date)->update([
-            'status' => 'ready',
+            'status' => 'completed',
         ]);
 
         // Finalize (combine data, mark processed, send email)
