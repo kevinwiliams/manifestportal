@@ -7,6 +7,7 @@ use App\Models\ManifestRow;
 use App\Models\ManifestUpload;
 use App\Services\FinalizeManifestService;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
