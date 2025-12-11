@@ -9,6 +9,16 @@
         <form action="{{ route('uploads.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
+            @if ($errors->any())
+                <div class="mb-4 text-red-600">
+                    <ul class="list-disc list-inside">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <div class="space-y-6">
 
                 <div>

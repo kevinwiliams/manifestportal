@@ -32,7 +32,8 @@ class UploadController extends Controller
         ]);
 
         // Try to auto-detect pub_code/pub_date from the uploaded file
-        $meta = ManifestImport::detectMetadata($request->file('file'));
+        // Use this controller's detection helper (same logic as AJAX detect)
+        $meta = self::detectMetadata($request->file('file'));
 
         $pubCode = $meta['pub_code'] ?? null;
         $pubDate = $meta['pub_date'] ?? null;
