@@ -18,9 +18,9 @@
                 <div>
                     <label class="block text-sm font-medium mb-1">Manifest File</label>
 
-                    <label class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50">
+                    <label class="relative flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50">
                         <span class="text-gray-500 text-sm">Drop file here or click to upload</span>
-                        <input id="manifest-file-input" type="file" name="file" class="hidden" required />
+                        <input id="manifest-file-input" type="file" name="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" required />
                     </label>
 
                     <div id="file-preview" class="mt-3 text-sm text-gray-700" aria-live="polite">
