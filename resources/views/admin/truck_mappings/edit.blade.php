@@ -7,7 +7,7 @@
     <div class="max-w-xl mx-auto bg-white shadow rounded p-6">
         <form action="{{ route('admin.truck-mappings.update', $mapping->id) }}" method="POST">
             @method('PUT')
-            @include('admin.truck-mappings._form')
+            @include('admin.truck_mappings._form')
         </form>
     </div>
 
