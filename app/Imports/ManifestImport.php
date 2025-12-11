@@ -60,8 +60,24 @@ class ManifestImport implements ToCollection, WithHeadingRow
             $pubDate = $this->upload->pub_date;
             if (!empty($row['pub_date'])) {
                 try {
-                    $pubDate = \Carbon\Carbon::parse($row['pub_date']);
-                } catch (\Throwable $e) {}
+                    $rawDate = $row['pub_date'];
+                    // Handle Excel serial numbers (e.g., 45627 for Dec 1, 2025)
+                    if (is_numeric($rawDate)) {
+                        $numericDate = (int)$rawDate;
+                        if ($numericDate > 0) {
+                            $unixTimestamp = ($numericDate - 25569) * 86400;
+                            $pubDate = \Carbon\Carbon::createFromTimestamp($unixTimestamp);
+                        }
+                    } elseif (preg_match('/^\d{1,2}\/\d{1,2}\/\d{4}$/', $rawDate)) {
+                        // MM/DD/YYYY format
+                        $pubDate = \Carbon\Carbon::createFromFormat('m/d/Y', $rawDate);
+                    } else {
+                        // Fallback to auto-parse
+                        $pubDate = \Carbon\Carbon::parse($rawDate);
+                    }
+                } catch (\Throwable $e) {
+                    \Log::warning('[ManifestImport] failed to parse pub_date', ['rawDate' => $rawDate, 'exception' => $e->getMessage()]);
+                }
 }
 
             $truckDescr = trim($row['truck_descr'] ?? '');
