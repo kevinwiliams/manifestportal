@@ -31,7 +31,7 @@
                     <!-- Admin Dropdown -->
                     <x-dropdown align="left" width="48">
                         <x-slot name="trigger">
-                            <button class="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700">
+                            <button class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-600 hover:text-gray-800 hover:border-gray-300">
                                 <div>Admin</div>
                                 <svg class="ml-2 h-4 w-4" viewBox="0 0 20 20"><path fill="currentColor" d="M5.5 7l4.5 4.5L14.5 7"/></svg>
                             </button>
