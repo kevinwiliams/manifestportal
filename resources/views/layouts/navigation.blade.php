@@ -34,6 +34,12 @@
                         Admin
                     </x-nav-link>
 
+                    @if(optional(Auth::user())->is_admin)
+                        <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                            Users
+                        </x-nav-link>
+                    @endif
+
                 </div>
             </div>
 
@@ -103,6 +109,11 @@
                 :active="request()->routeIs('admin.truck-mappings.*')">
                 Admin
             </x-responsive-nav-link>
+            @if(optional(Auth::user())->is_admin)
+                <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                    Users
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Mobile Profile -->
