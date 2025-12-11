@@ -120,6 +120,43 @@ class EmailQueueService
     }
 
     /**
+     * Queue a manifest finalization notification.
+     *
+     * Called after a combined manifest is created from multiple uploads.
+     */
+    public static function queueManifestCompleted(string $pubDate, $uploads, int $rowCount): void
+    {
+        $dateFormatted = \Carbon\Carbon::parse($pubDate)->format('d/m/Y');
+        $uploadCount = $uploads->count();
+        $pubCodes = $uploads->pluck('pub_code')->join(', ');
+
+        $subject = "Manifest finalized for {$dateFormatted} (Pub Codes: {$pubCodes})";
+
+        $bodyLines = [
+            'A manifest has been finalized and combined.',
+            '',
+            "Publication Date: {$dateFormatted}",
+            "Publication Codes: {$pubCodes}",
+            "Number of uploads: {$uploadCount}",
+            "Total rows in combined manifest: {$rowCount}",
+        ];
+
+        $body = implode("\r\n", $bodyLines);
+
+        // Add meta for reference
+        $extra = [
+            'meta' => json_encode([
+                'pub_date' => $pubDate,
+                'pub_codes' => $pubCodes,
+                'upload_count' => $uploadCount,
+                'row_count' => $rowCount,
+            ]),
+        ];
+
+        self::queueMessage(null, $subject, $body, null, null, null, $extra);
+    }
+
+    /**
      * Normalize address inputs: accept array or string; fallback to default.
      */
     protected static function normalizeAddressList(string|array|null $value, ?string $default = null): string
