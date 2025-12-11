@@ -80,6 +80,28 @@ class UploadController extends Controller
     }
 
     /**
+     * AJAX endpoint to detect pub_code and pub_date from an uploaded file.
+     */
+    public function detect(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt,xlsx,xls',
+        ]);
+
+        try {
+            $meta = \App\Imports\ManifestImport::detectMetadata($request->file('file'));
+        } catch (\Throwable $e) {
+            return response()->json(['error' => 'Failed to parse file for metadata.'], 422);
+        }
+
+        if (empty($meta)) {
+            return response()->json(['meta' => null], 200);
+        }
+
+        return response()->json(['meta' => $meta], 200);
+    }
+
+    /**
      * If another upload with the same date and a different pub_code exists,
      * mark them as ready and finalize the manifest.
      */

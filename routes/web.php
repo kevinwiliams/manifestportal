@@ -68,6 +68,7 @@ Route::middleware(['auth'])->prefix('uploads')->name('uploads.')->group(function
 
     Route::get('/',          [UploadController::class, 'index'])->name('index');
     Route::get('/new',       [UploadController::class, 'create'])->name('create');
+    Route::post('/detect',   [UploadController::class, 'detect'])->name('detect');
     Route::post('/new',      [UploadController::class, 'store'])->name('store');
     Route::get('/{upload}',  [UploadController::class, 'show'])->name('show');
 });

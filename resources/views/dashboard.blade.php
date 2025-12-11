@@ -3,7 +3,7 @@
         <h2 class="text-xl font-semibold">Dashboard</h2>
     </x-slot>
 
-    <div class="max-w-7xl mx-auto grid md:grid-cols-3 gap-6">
+    <div class="max-w-3xl mx-auto grid md:grid-cols-3 gap-6">
         @foreach($summary as $row)
             <div class="bg-white shadow rounded p-5">
                 <div class="text-sm text-gray-500">Publication Date</div>
