@@ -53,13 +53,16 @@ class ManifestImport implements ToCollection, WithHeadingRow
             $account = trim($row['account'] ?? '');
             $group = trim($row['group'] ?? '');
             $draw = $row['draw'] ?? null;
-            $returns = $row['returns'] ?? null;
+            // handle duplicate "returns" header
+            $returns = $row['returns'] ?? $row['returns_1'] ?? null;
 
             $pubCode = trim($row['pub_code'] ?? $this->upload->pub_code);
             $pubDate = $this->upload->pub_date;
-            if (! empty($row['pub_date'])) {
-                $pubDate = Carbon::parse($row['pub_date']);
-            }
+            if (!empty($row['pub_date'])) {
+                try {
+                    $pubDate = \Carbon\Carbon::parse($row['pub_date']);
+                } catch (\Throwable $e) {}
+}
 
             $truckDescr = trim($row['truck_descr'] ?? '');
             $dropInstructions = trim($row['drop_instructions'] ?? '');
@@ -90,7 +93,7 @@ class ManifestImport implements ToCollection, WithHeadingRow
             if ($account !== '') {
                 $exists = ManifestRow::where('pub_date', $pubDate)
                     ->where('pub_code', $pubCode)
-                    ->where('account', $account)
+                    ->where('route', $route)
                     ->exists();
 
                 if ($exists) {
