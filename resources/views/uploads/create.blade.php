@@ -12,17 +12,7 @@
             <div class="space-y-6">
 
                 <div>
-                    <label class="block text-sm font-medium mb-1">Publication Code</label>
-                    <input type="text" name="pub_code"
-                           class="w-full border-gray-300 rounded"
-                           required>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium mb-1">Publication Date</label>
-                    <input type="date" name="pub_date"
-                           class="w-full border-gray-300 rounded"
-                           required>
+                    <p class="text-sm text-gray-600 mb-1">Publication Code and Date will be extracted from the file</p>
                 </div>
 
                 <div>

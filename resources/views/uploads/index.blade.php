@@ -6,7 +6,7 @@
         </h2>
     </x-slot>
 
-    <div class="max-w-7xl mx-auto">
+    <div class="max-w-3xl mx-auto">
 
         <div class="flex justify-end mb-4">
             <a href="{{ route('uploads.create') }}"

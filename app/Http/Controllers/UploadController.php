@@ -25,20 +25,18 @@ class UploadController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'pub_code' => 'nullable|string',
-            'pub_date' => 'nullable|date',
-            'file'     => 'required|file|mimes:csv,txt,xlsx',
+            'file'     => 'required|file|mimes:csv,txt,xlsx,xls',
         ]);
 
-        // Try to auto-detect pub_code/pub_date from the file
+        // Try to auto-detect pub_code/pub_date from the uploaded file
         $meta = ManifestImport::detectMetadata($request->file('file'));
 
-        $pubCode = $request->input('pub_code') ?: ($meta['pub_code'] ?? null);
-        $pubDate = $request->input('pub_date') ?: ($meta['pub_date'] ?? null);
+        $pubCode = $meta['pub_code'] ?? null;
+        $pubDate = $meta['pub_date'] ?? null;
 
-        if (!$pubCode || !$pubDate) {
+        if (! $pubCode || ! $pubDate) {
             return back()
-                ->withErrors(['upload' => 'Could not determine Publication Code or Publication Date. Please fill both fields or check file headers.'])
+                ->withErrors(['upload' => "Could not determine Publication Code or Publication Date from the uploaded file. Ensure the file contains columns like 'pub code' and 'pub date'."])
                 ->withInput();
         }
 
@@ -52,6 +50,7 @@ class UploadController extends Controller
                 'status'        => 'pending',
                 'imported_rows' => 0,
                 'user_id'       => auth()->id(),
+                'original_filename' => $request->file('file')->getClientOriginalName(),
             ]);
 
             // Store original file
@@ -59,9 +58,9 @@ class UploadController extends Controller
             $upload->stored_path = $path;
             $upload->save();
 
-            // Import rows
-            $service = new ManifestImport();
-            $importCount = $service->import($upload, $request->file('file'));
+            // Import rows: instantiate with the upload and pass stored path
+            $service = new ManifestImport($upload);
+            $importCount = $service->import($upload, $path);
 
             $upload->update(['imported_rows' => $importCount]);
 

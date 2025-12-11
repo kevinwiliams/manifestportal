@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="max-w-7xl mx-auto space-y-6">
+    <div class="max-w-3xl mx-auto space-y-6">
 
         <div class="bg-white shadow rounded p-6">
             <div class="flex items-center justify-between mb-4">
