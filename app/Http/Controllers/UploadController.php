@@ -89,7 +89,7 @@ class UploadController extends Controller
     }
 
     /**
-     * AJAX endpoint to detect pub_code and pub_date from an uploaded file.
+     * Controller AJAX action: receive an uploaded file and return detected metadata as JSON.
      */
     public function detect(Request $request)
     {
@@ -98,7 +98,7 @@ class UploadController extends Controller
         ]);
 
         try {
-            $meta = \App\Imports\ManifestImport::detectMetadata($request->file('file'));
+            $meta = self::detectMetadata($request->file('file'));
         } catch (\Throwable $e) {
             return response()->json(['error' => 'Failed to parse file for metadata.'], 422);
         }
@@ -109,6 +109,53 @@ class UploadController extends Controller
 
         return response()->json(['meta' => $meta], 200);
     }
+
+    /**
+     * Helper: detect pub_code and pub_date from an UploadedFile.
+     */
+    public static function detectMetadata(UploadedFile $file): array
+    {
+        try {
+            // Force CSV reading
+            $rows = Excel::toArray([], $file, null, \Maatwebsite\Excel\Excel::CSV)[0] ?? [];
+        } catch (\Throwable $e) {
+            return [];
+        }
+
+        if (empty($rows)) {
+            return [];
+        }
+
+        // Normalize header
+        $header = array_map(fn($h) => strtolower(trim($h)), $rows[0]);
+
+        // Find the column indexes
+        $pubCodeIndex = array_search('pub code', $header);
+        $pubDateIndex = array_search('pub date', $header);
+
+        if ($pubCodeIndex === false || $pubDateIndex === false) {
+            return [];
+        }
+
+        // Use first data row
+        $row = $rows[1] ?? null;
+        if (!$row) return [];
+
+        $pubCode = trim($row[$pubCodeIndex] ?? '');
+        $rawDate = $row[$pubDateIndex] ?? '';
+
+        try {
+            $pubDate = \Carbon\Carbon::parse($rawDate)->format('Y-m-d');
+        } catch (\Throwable $e) {
+            $pubDate = null;
+        }
+
+        return [
+            'pub_code' => $pubCode,
+            'pub_date' => $pubDate,
+        ];
+    }
+
 
     /**
      * If another upload with the same date and a different pub_code exists,
