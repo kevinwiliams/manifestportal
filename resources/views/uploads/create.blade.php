@@ -173,6 +173,14 @@ function initUploadPreview() {
 }
 
 // Ensure init runs whether DOMContentLoaded has fired already or not
+// Expose for debugging
+try {
+    window.initUploadPreview = initUploadPreview;
+    console.log('[upload] initUploadPreview bound to window');
+} catch (e) {
+    console.warn('[upload] could not bind initUploadPreview to window', e);
+}
+
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initUploadPreview);
 } else {
