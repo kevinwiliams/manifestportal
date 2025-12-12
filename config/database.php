@@ -130,6 +130,12 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'ODBCDriver' => env('DB_ODBC_DRIVER', 'ODBC Driver 17 for SQL Server'),
+            'options' => [
+                // Control encryption/trust with env vars. In production ensure encrypt is enabled and
+                // trust server certificate is set appropriately.
+                'Encrypt' => env('DB_ENCRYPT', 'yes'),
+                'TrustServerCertificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
+            ],
         ],
 
     ],
