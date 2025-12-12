@@ -59,4 +59,9 @@ class TruckSummaryReportExport implements FromCollection, Responsable, WithHeadi
             ->orderBy('truck')
             ->get();
     }
+
+    public function toResponse($request)
+    {
+        return \Maatwebsite\Excel\Facades\Excel::download($this, $this->fileName);
+    }
 }

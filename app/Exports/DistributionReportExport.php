@@ -90,4 +90,9 @@ class DistributionReportExport implements FromCollection, Responsable, WithHeadi
                 'pub_date',
             ]);
     }
+
+    public function toResponse($request)
+    {
+        return \Maatwebsite\Excel\Facades\Excel::download($this, $this->fileName);
+    }
 }
