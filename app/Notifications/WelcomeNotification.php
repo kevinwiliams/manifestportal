@@ -16,7 +16,7 @@ class WelcomeNotification extends Notification
 
     public function via($notifiable)
     {
-        return ['custom'];
+        return [\App\Notifications\Channels\EmailQueueChannel::class];
     }
 
     public function toCustom($notifiable)

@@ -15,7 +15,7 @@ class ResetPasswordNotification extends ResetPassword
      */
     public function via($notifiable)
     {
-        return ['custom'];
+        return [\App\Notifications\Channels\EmailQueueChannel::class];
     }
 
     /**
