@@ -34,7 +34,7 @@ class EmailQueueService
         }
 
         $connection = Config::get('emailqueue.connection', 'adhoc');
-        $procedure = Config::get('emailqueue.procedure', 'dbo.InsertMessageQueue');
+        $procedure = Config::get('emailqueue.procedure', 'dbo.usp_MessageQueue_Add');
         $encoding = Config::get('emailqueue.encoding', 'UTF-8');
 
         // Normalize addresses: accept array or string
@@ -71,8 +71,7 @@ class EmailQueueService
         ]);
 
         try {
-            // EXEC dbo.InsertMessageQueue @mess = ?
-            // Your stored procedure should take a single NVARCHAR parameter
+            // EXEC dbo.usp_MessageQueue_Add @mess = ?
             DB::connection($connection)->statement("EXEC {$procedure} ?", [$payload]);
         } catch (Throwable $e) {
             self::log('Failed to queue email via messagequeue', [

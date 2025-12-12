@@ -16,7 +16,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'connection' => env('EMAILQUEUE_DB_CONNECTION', 'adhoc'),   // sqlsrv connection name
-    'procedure' => env('EMAILQUEUE_STORED_PROCEDURE', 'dbo.InsertMessageQueue'),
+    'procedure' => env('EMAILQUEUE_STORED_PROCEDURE', 'dbo.usp_MessageQueue_Add'),
 
     /*
     |--------------------------------------------------------------------------
@@ -24,9 +24,9 @@ return [
     |--------------------------------------------------------------------------
     */
     'default_from' => env('EMAILQUEUE_FROM', 'jvmanifest@jamaicaobserver.com'),
-    'default_to' => env('EMAILQUEUE_TO', 'michelled@jamaicaobserver.com'),
-    'default_cc' => env('EMAILQUEUE_CC', 'reids@jamaicaobserver.com;wests@jamaicaobserver.com;morgano@jamaicaobserver.com'),
-    'default_bcc' => env('EMAILQUEUE_BCC', 'itdepartment@jamaicaobserver.com'),
+    'default_to' => env('EMAILQUEUE_TO', 'williamskt@jamaicaobserver.com'),
+    'default_cc' => env('EMAILQUEUE_CC', ''),
+    'default_bcc' => env('EMAILQUEUE_BCC', ''),
 
     'encoding' => env('EMAILQUEUE_ENCODING', 'UTF-8'),
 
