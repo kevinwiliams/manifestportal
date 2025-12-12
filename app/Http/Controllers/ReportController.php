@@ -90,14 +90,17 @@ class ReportController extends Controller
             $query->where('type', $request->type);
         }
 
-        $rows = $query->orderBy('truck')->orderBy('seq')->get();
+        // Limit to 500 rows per PDF to avoid memory exhaustion
+        $rows = $query->orderBy('truck')->orderBy('seq')->limit(500)->get();
 
         $pdf = Pdf::loadView('reports.pdf.distribution', [
             'rows' => $rows,
             'filters' => $request->all(),
-        ])->setPaper('A4', 'landscape');
+        ])->setPaper('A4', 'landscape')
+          ->setOption('memory_limit', '256M')
+          ->setOption('enable_remote', false);
 
-        return $pdf->stream('distribution-report.pdf');
+        return $pdf->download('distribution-report.pdf');
     }
 
     public function truckSummary(Request $request)
@@ -170,9 +173,11 @@ class ReportController extends Controller
         $pdf = Pdf::loadView('reports.pdf.truck_summary', [
             'summary' => $summary,
             'filters' => $request->all(),
-        ])->setPaper('A4', 'landscape');
+        ])->setPaper('A4', 'landscape')
+          ->setOption('memory_limit', '256M')
+          ->setOption('enable_remote', false);
 
-        return $pdf->stream('truck-summary-report.pdf');
+        return $pdf->download('truck-summary-report.pdf');
     }
 
     /**
