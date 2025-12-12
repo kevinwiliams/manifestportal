@@ -13,7 +13,7 @@ class ResetPasswordNotification extends ResetPassword
      *
      * Override to queue through the messagequeue stored procedure.
      */
-    public function via(object $notifiable): array
+    public function via($notifiable)
     {
         return ['custom'];
     }
@@ -21,7 +21,7 @@ class ResetPasswordNotification extends ResetPassword
     /**
      * Custom channel handler: queue via EmailQueueService.
      */
-    public function toCustom(object $notifiable): void
+    public function toCustom($notifiable)
     {
         $resetUrl = route('password.reset', [
             'token' => $this->token,
