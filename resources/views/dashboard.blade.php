@@ -7,7 +7,7 @@
         @foreach($summary as $row)
             <div class="bg-white shadow rounded p-5">
                 <div class="text-sm text-gray-500">Publication Date</div>
-                <div class="text-lg font-semibold mb-2">{{ $row->pub_date }}</div>
+                <div class="text-lg font-semibold mb-2">{{ date('d-M-y', strtotime($row->pub_date)) }}</div>
 
                 <div class="text-sm text-gray-600">
                     Uploads: {{ $row->upload_count }}<br>

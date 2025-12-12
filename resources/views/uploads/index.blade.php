@@ -34,7 +34,7 @@
                     <tr class="hover:bg-gray-50">
 
                         <td class="px-4 py-3 text-sm">
-                            <span class="font-semibold">{{ $upload->pub_date }}</span>
+                            <span class="font-semibold">{{ date('Y-m-d', strtotime($upload->pub_date)) }}</span>
                         </td>
 
                         <td class="px-4 py-3 text-sm">

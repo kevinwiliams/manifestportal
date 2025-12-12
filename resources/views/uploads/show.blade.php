@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="text-xl font-semibold">
-            Upload Details – {{ $upload->pub_code }} ({{ $upload->pub_date }})
+            Upload Details – {{ $upload->pub_code }} ({{ date('Y-m-d', strtotime($upload->pub_date)) }})
         </h2>
     </x-slot>
 
@@ -11,7 +11,7 @@
             <div class="flex items-center justify-between mb-4">
                 <div>
                     <p class="text-sm text-gray-600">Publication Date</p>
-                    <p class="text-lg font-semibold">{{ $upload->pub_date }}</p>
+                    <p class="text-lg font-semibold">{{  date('Y-m-d', strtotime($upload->pub_date)) }}</p>
                 </div>
 
                 <div>
