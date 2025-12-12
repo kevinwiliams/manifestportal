@@ -38,7 +38,7 @@ class FinalizeManifestService
         $handle = fopen('php://temp', 'r+');
         fputcsv($handle, [
             'Truck', 'Name', 'Drop Address', 'Route', 'Type', 'Seq',
-            'Account', 'Group', 'Draw', 'Returns', 'Pub Code', 'Pub Date',
+            'Account', 'Group', 'Draw', 'Returns', 'Pub Code', 'Pub Date', 'Truck Descr', 'Drop Instructions',
         ]);
 
         foreach ($rows as $r) {
@@ -55,6 +55,8 @@ class FinalizeManifestService
                 $r->returns,
                 $r->pub_code,
                 $r->pub_date,
+                $r->truck_descr,
+                $r->drop_instructions,
             ]);
         }
 
