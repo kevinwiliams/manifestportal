@@ -144,7 +144,7 @@ class ManifestImport implements ToCollection, WithHeadingRow
             'total_rows' => $this->upload->total_rows,
             'imported_rows' => $this->imported,
             'skipped_rows' => $this->skipped,
-            'status' => 'completed',
+            'status' => 'pending',
         ]);
     }
 

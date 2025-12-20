@@ -98,7 +98,7 @@
                         <h3 class="text-lg font-semibold text-gray-900">Recent Uploads</h3>
                         <p class="text-sm text-gray-600 mt-1">Sorted by most recent first</p>
                     </div>
-                    <div class="flex space-x-2">
+                    <!--<div class="flex space-x-2">
                         <button class="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
                             <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
@@ -111,7 +111,7 @@
                             </svg>
                             Export
                         </button>
-                    </div>
+                    </div>-->
                 </div>
             </div>
 
@@ -262,7 +262,7 @@
 
                             <!-- Actions Column -->
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <div class="flex items-center space-x-3">
+                                <div class="items-center">
                                     <a href="{{ route('uploads.show', $upload->id) }}"
                                        class="text-blue-600 hover:text-blue-900 flex items-center group">
                                         <svg class="w-4 h-4 mr-1 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
